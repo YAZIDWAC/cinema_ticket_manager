@@ -64,9 +64,9 @@ class MyApp extends StatelessWidget {
 
         // SESSIONS
         BlocProvider<SessionBloc>(
-          create: (_) =>
-              SessionBloc(SessionRepository())..add(LoadSessions()),
-        ),
+  create: (_) =>
+      SessionBloc(SessionRepository())..add(LoadSessions()),
+),
 
         // RESERVATIONS ✅
         BlocProvider<ReservationBloc>(

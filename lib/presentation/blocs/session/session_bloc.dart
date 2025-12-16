@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../data/repositories/session_repository.dart';
 import 'session_event.dart';
 import 'session_state.dart';
-
 class SessionBloc extends Bloc<SessionEvent, SessionState> {
   final SessionRepository repository;
 
