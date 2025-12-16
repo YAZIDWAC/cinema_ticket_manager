@@ -12,7 +12,7 @@ class ReservationModel {
   final int price;
   final int total;
   final String qrCode;
-  final Timestamp createdAt;
+  final DateTime? createdAt; // ✅ nullable côté app
 
   ReservationModel({
     required this.id,
@@ -26,7 +26,7 @@ class ReservationModel {
     required this.price,
     required this.total,
     required this.qrCode,
-    required this.createdAt,
+    this.createdAt,
   });
 
   factory ReservationModel.fromFirestore(DocumentSnapshot doc) {
@@ -44,7 +44,9 @@ class ReservationModel {
       price: data['price'],
       total: data['total'],
       qrCode: data['qrCode'],
-      createdAt: data['createdAt'],
+      createdAt: data['createdAt'] != null
+          ? (data['createdAt'] as Timestamp).toDate()
+          : null,
     );
   }
 
@@ -60,7 +62,7 @@ class ReservationModel {
       'price': price,
       'total': total,
       'qrCode': qrCode,
-      'createdAt': createdAt,
+      'createdAt': FieldValue.serverTimestamp(), // ✅ correct
     };
   }
 }

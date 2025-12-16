@@ -7,6 +7,8 @@ class SessionModel {
   final DateTime startTime;
   final DateTime endTime;
   final int price;
+  final int totalSeats;
+  final int reservedSeats;
 
   SessionModel({
     required this.id,
@@ -15,24 +17,24 @@ class SessionModel {
     required this.startTime,
     required this.endTime,
     required this.price,
+    required this.totalSeats,
+    required this.reservedSeats,
   });
+
+  int get availableSeats => totalSeats - reservedSeats;
 
   factory SessionModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
 
-    final Timestamp? startTs = data['startTime'];
-    final Timestamp? endTs = data['endTime'];
-
     return SessionModel(
       id: doc.id,
-      movieTitle: data['movieTitle'] ?? '',
-      salle: data['salle'] ?? '',
-      startTime: startTs?.toDate() ?? DateTime.now(),
-      endTime: endTs?.toDate() ??
-          DateTime.now().add(const Duration(minutes: 90)),
-      price: (data['price'] is int)
-          ? data['price']
-          : int.tryParse(data['price'].toString()) ?? 0,
+      movieTitle: data['movieTitle'],
+      salle: data['salle'],
+      startTime: (data['startTime'] as Timestamp).toDate(),
+      endTime: (data['endTime'] as Timestamp).toDate(),
+      price: data['price'],
+      totalSeats: data['totalSeats'] ?? 0,
+      reservedSeats: data['reservedSeats'] ?? 0,
     );
   }
 
@@ -43,6 +45,11 @@ class SessionModel {
       'startTime': Timestamp.fromDate(startTime),
       'endTime': Timestamp.fromDate(endTime),
       'price': price,
+      'totalSeats': totalSeats,
+      'reservedSeats': reservedSeats,
     };
+    
   }
+  int get remainingSeats => totalSeats - reservedSeats;
+
 }

@@ -23,11 +23,9 @@ class SessionsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Séances"),
-      ),
+      appBar: AppBar(title: const Text("Séances")),
 
-      /// ➕ AJOUT SÉANCE (ADMIN SEULEMENT)
+      /// ➕ AJOUT (ADMIN)
       floatingActionButton: isAdmin
           ? FloatingActionButton(
               child: const Icon(Icons.add),
@@ -51,17 +49,13 @@ class SessionsPage extends StatelessWidget {
           if (state is SessionLoaded) {
             List<SessionModel> sessions = state.sessions;
 
-            /// 🎬 FILTRAGE PAR FILM (CLIENT)
             if (movieTitle != null) {
-              sessions = sessions
-                  .where((s) => s.movieTitle == movieTitle)
-                  .toList();
+              sessions =
+                  sessions.where((s) => s.movieTitle == movieTitle).toList();
             }
 
             if (sessions.isEmpty) {
-              return const Center(
-                child: Text("Aucune séance disponible"),
-              );
+              return const Center(child: Text("Aucune séance disponible"));
             }
 
             return ListView.builder(
@@ -74,16 +68,19 @@ class SessionsPage extends StatelessWidget {
                     session.startTime.toLocal().toString().split(' ')[0];
 
                 final time =
-                    "${session.startTime.hour.toString().padLeft(2, '0')}:"
-                    "${session.startTime.minute.toString().padLeft(2, '0')}";
+                    "${session.startTime.hour.toString().padLeft(2, '0')}:${session.startTime.minute.toString().padLeft(2, '0')}";
 
                 return Card(
-                  elevation: 3,
-                  margin: const EdgeInsets.only(bottom: 12),
+                  elevation: 4,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(16),
                   ),
+                  margin: const EdgeInsets.only(bottom: 12),
                   child: ListTile(
+                    leading: const Icon(
+                      Icons.schedule,
+                      color: Colors.deepPurple,
+                    ),
                     title: Text(
                       session.movieTitle,
                       style: const TextStyle(
@@ -91,17 +88,24 @@ class SessionsPage extends StatelessWidget {
                         fontSize: 16,
                       ),
                     ),
-                    subtitle: Padding(
-                      padding: const EdgeInsets.only(top: 6),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Salle : ${session.salle}"),
-                          Text("Date : $date"),
-                          Text("Heure : $time"),
-                          Text("Prix : ${session.price} DH"),
-                        ],
-                      ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 4),
+                        Text("Salle : ${session.salle}"),
+                        Text("Date : $date"),
+                        Text("Heure : $time"),
+                        Text("Prix : ${session.price} DH"),
+                        Text(
+                          "Places restantes : ${session.remainingSeats}",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: session.remainingSeats > 0
+                                ? Colors.green
+                                : Colors.red,
+                          ),
+                        ),
+                      ],
                     ),
 
                     /// 👑 ADMIN / 👤 CLIENT
@@ -109,22 +113,18 @@ class SessionsPage extends StatelessWidget {
                         ? Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              /// ✏️ MODIFIER
                               IconButton(
                                 icon: const Icon(Icons.edit),
                                 onPressed: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => AddSessionPage(
-                                        session: session,
-                                      ),
+                                      builder: (_) =>
+                                          AddSessionPage(session: session),
                                     ),
                                   );
                                 },
                               ),
-
-                              /// 🗑 SUPPRIMER
                               IconButton(
                                 icon: const Icon(Icons.delete),
                                 onPressed: () {
@@ -136,16 +136,23 @@ class SessionsPage extends StatelessWidget {
                             ],
                           )
                         : ElevatedButton(
-                            child: const Text("Réserver"),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      AddReservationPage(session: session),
-                                ),
-                              );
-                            },
+                            onPressed: session.remainingSeats > 0
+                                ? () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => AddReservationPage(
+                                          session: session,
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                : null,
+                            child: Text(
+                              session.remainingSeats > 0
+                                  ? "Réserver"
+                                  : "Complet",
+                            ),
                           ),
                   ),
                 );

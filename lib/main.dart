@@ -75,9 +75,40 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: LoginPage(),
+  debugShowCheckedModeBanner: false,
+  theme: ThemeData(
+    primaryColor: Colors.deepPurple,
+    scaffoldBackgroundColor: const Color(0xFFF5F5F5),
+
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.deepPurple,
+      foregroundColor: Colors.white,
+      centerTitle: true,
+      elevation: 0,
+    ),
+
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.deepPurple,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 14),
       ),
+    ),
+
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: Colors.white,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
+      ),
+    ),
+  ),
+  home: LoginPage(),
+),
+
     );
   }
 }
