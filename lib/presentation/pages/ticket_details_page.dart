@@ -7,14 +7,23 @@ class TicketDetailsPage extends StatelessWidget {
   final ReservationModel reservation;
 
   const TicketDetailsPage({
-    Key? key,
+    super.key,
     required this.reservation,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
+    final date =
+        reservation.startTime.toLocal().toString().split(' ')[0];
+
+    final time =
+        "${reservation.startTime.hour.toString().padLeft(2, '0')}:"
+        "${reservation.startTime.minute.toString().padLeft(2, '0')}";
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Détails du ticket")),
+      appBar: AppBar(
+        title: const Text("Détails du ticket"),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -27,25 +36,36 @@ class TicketDetailsPage extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
+
+            const SizedBox(height: 12),
+
             Text("Salle : ${reservation.salle}"),
-            Text("Date : ${reservation.date}"),
-            Text("Heure : ${reservation.time}"),
+            Text("Date : $date"),
+            Text("Heure : $time"),
             Text("Tickets : ${reservation.tickets}"),
+
+            const SizedBox(height: 8),
+
             Text(
               "Total payé : ${reservation.total} DH",
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
+                fontSize: 16,
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
 
             const Text(
               "QR Code",
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
             ),
-            const SizedBox(height: 12),
+
+            const SizedBox(height: 16),
+
             QrImageView(
               data: reservation.qrCode,
               size: 220,

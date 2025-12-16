@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../domain/models/movie_model.dart';
 import '../../domain/models/session_model.dart';
 
 import '../blocs/movie/movie_bloc.dart';
-import '../blocs/movie/movie_event.dart';
 import '../blocs/movie/movie_state.dart';
 
 import '../blocs/salle/salle_bloc.dart';
-import '../blocs/salle/salle_event.dart';
 import '../blocs/salle/salle_state.dart';
 
 import '../blocs/session/session_bloc.dart';
@@ -17,14 +16,17 @@ import '../blocs/session/session_event.dart';
 class AddSessionPage extends StatefulWidget {
   final SessionModel? session;
 
-  const AddSessionPage({super.key, this.session});
+  const AddSessionPage({
+    super.key,
+    this.session,
+  });
 
   @override
   State<AddSessionPage> createState() => _AddSessionPageState();
 }
 
 class _AddSessionPageState extends State<AddSessionPage> {
-  String? selectedMovie;
+  MovieModel? selectedMovie;
   String? selectedSalle;
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
@@ -35,17 +37,17 @@ class _AddSessionPageState extends State<AddSessionPage> {
   void initState() {
     super.initState();
 
-    context.read<MovieBloc>().add(LoadMovies());
-    context.read<SalleBloc>().add(LoadSalles());
-
     if (widget.session != null) {
       final s = widget.session!;
-      selectedMovie = s.movieTitle;
       selectedSalle = s.salle;
-      selectedDate = DateTime.parse(s.date);
+      selectedDate = DateTime(
+        s.startTime.year,
+        s.startTime.month,
+        s.startTime.day,
+      );
       selectedTime = TimeOfDay(
-        hour: int.parse(s.time.split(':')[0]),
-        minute: int.parse(s.time.split(':')[1]),
+        hour: s.startTime.hour,
+        minute: s.startTime.minute,
       );
       priceController.text = s.price.toString();
     }
@@ -57,24 +59,26 @@ class _AddSessionPageState extends State<AddSessionPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEdit ? 'Modifier la séance' : 'Ajouter une séance'),
+        title: Text(isEdit ? "Modifier la séance" : "Ajouter une séance"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: ListView(
           children: [
-            /// FILM
+            /// 🎬 FILM
             BlocBuilder<MovieBloc, MovieState>(
               builder: (context, state) {
                 if (state is MovieLoaded) {
-                  return DropdownButtonFormField<String>(
-                    value: selectedMovie,
+                  return DropdownButtonFormField<MovieModel>(
                     decoration: const InputDecoration(labelText: 'Film'),
+                    value: selectedMovie,
                     items: state.movies
-                        .map((m) => DropdownMenuItem(
-                              value: m.title,
-                              child: Text(m.title),
-                            ))
+                        .map(
+                          (m) => DropdownMenuItem<MovieModel>(
+                            value: m,
+                            child: Text(m.title),
+                          ),
+                        )
                         .toList(),
                     onChanged: (v) => setState(() => selectedMovie = v),
                   );
@@ -85,18 +89,20 @@ class _AddSessionPageState extends State<AddSessionPage> {
 
             const SizedBox(height: 16),
 
-            /// SALLE
+            /// 🏢 SALLE
             BlocBuilder<SalleBloc, SalleState>(
               builder: (context, state) {
                 if (state is SalleLoaded) {
                   return DropdownButtonFormField<String>(
-                    value: selectedSalle,
                     decoration: const InputDecoration(labelText: 'Salle'),
+                    value: selectedSalle,
                     items: state.salles
-                        .map((s) => DropdownMenuItem(
-                              value: s.name,
-                              child: Text(s.name),
-                            ))
+                        .map(
+                          (s) => DropdownMenuItem<String>(
+                            value: s.name,
+                            child: Text(s.name),
+                          ),
+                        )
                         .toList(),
                     onChanged: (v) => setState(() => selectedSalle = v),
                   );
@@ -107,16 +113,14 @@ class _AddSessionPageState extends State<AddSessionPage> {
 
             const SizedBox(height: 16),
 
-            /// DATE
-            TextFormField(
-              readOnly: true,
-              decoration: const InputDecoration(labelText: 'Date'),
-              controller: TextEditingController(
-                text: selectedDate == null
-                    ? ''
-                    : '${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}',
+            /// 📅 DATE
+            ElevatedButton(
+              child: Text(
+                selectedDate == null
+                    ? "Choisir une date"
+                    : selectedDate!.toIso8601String().split('T')[0],
               ),
-              onTap: () async {
+              onPressed: () async {
                 final d = await showDatePicker(
                   context: context,
                   initialDate: DateTime.now(),
@@ -127,16 +131,14 @@ class _AddSessionPageState extends State<AddSessionPage> {
               },
             ),
 
-            const SizedBox(height: 16),
-
-            /// HEURE
-            TextFormField(
-              readOnly: true,
-              decoration: const InputDecoration(labelText: 'Heure'),
-              controller: TextEditingController(
-                text: selectedTime?.format(context) ?? '',
+            /// ⏰ HEURE
+            ElevatedButton(
+              child: Text(
+                selectedTime == null
+                    ? "Choisir une heure"
+                    : selectedTime!.format(context),
               ),
-              onTap: () async {
+              onPressed: () async {
                 final t = await showTimePicker(
                   context: context,
                   initialTime: TimeOfDay.now(),
@@ -147,16 +149,18 @@ class _AddSessionPageState extends State<AddSessionPage> {
 
             const SizedBox(height: 16),
 
-            /// PRIX
+            /// 💰 PRIX
             TextField(
               controller: priceController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Prix (DA)'),
+              decoration: const InputDecoration(labelText: "Prix"),
             ),
 
             const SizedBox(height: 24),
 
+            /// 💾 ENREGISTRER
             ElevatedButton(
+              child: Text(isEdit ? "Modifier" : "Enregistrer"),
               onPressed: () {
                 if (selectedMovie == null ||
                     selectedSalle == null ||
@@ -164,34 +168,40 @@ class _AddSessionPageState extends State<AddSessionPage> {
                     selectedTime == null ||
                     priceController.text.isEmpty) return;
 
+                final startTime = DateTime(
+                  selectedDate!.year,
+                  selectedDate!.month,
+                  selectedDate!.day,
+                  selectedTime!.hour,
+                  selectedTime!.minute,
+                );
+
+                /// ✅ duration est INT → utilisation directe
+                final endTime = startTime.add(
+                  Duration(minutes: selectedMovie!.duration),
+                );
+
+                final session = SessionModel(
+                  id: widget.session?.id ?? '',
+                  movieTitle: selectedMovie!.title,
+                  salle: selectedSalle!,
+                  startTime: startTime,
+                  endTime: endTime,
+                  price: int.parse(priceController.text),
+                );
+
                 if (isEdit) {
-                  context.read<SessionBloc>().add(
-                        UpdateSession(
-                          id: widget.session!.id,
-                          movieTitle: selectedMovie!,
-                          salle: selectedSalle!,
-                          date:
-                              '${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}',
-                          time: selectedTime!.format(context),
-                          price: int.parse(priceController.text),
-                        ),
-                      );
+                  context
+                      .read<SessionBloc>()
+                      .add(UpdateSession(session: session));
                 } else {
-                  context.read<SessionBloc>().add(
-                        AddSession(
-                          movieTitle: selectedMovie!,
-                          salle: selectedSalle!,
-                          date:
-                              '${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}',
-                          time: selectedTime!.format(context),
-                          price: int.parse(priceController.text),
-                        ),
-                      );
+                  context
+                      .read<SessionBloc>()
+                      .add(AddSession(session: session));
                 }
 
                 Navigator.pop(context);
               },
-              child: Text(isEdit ? 'Modifier' : 'Enregistrer'),
             ),
           ],
         ),

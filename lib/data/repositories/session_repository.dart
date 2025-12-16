@@ -5,7 +5,6 @@ class SessionRepository {
   final CollectionReference _db =
       FirebaseFirestore.instance.collection('sessions');
 
-  /// 🔁 STREAM DES SÉANCES
   Stream<List<SessionModel>> getSessions() {
     return _db.snapshots().map(
           (snapshot) => snapshot.docs
@@ -14,42 +13,14 @@ class SessionRepository {
         );
   }
 
-  /// ➕ AJOUT
-  Future<void> addSession({
-    required String movieTitle,
-    required String salle,
-    required String date,
-    required String time,
-    required int price,
-  }) async {
-    await _db.add({
-      'movieTitle': movieTitle,
-      'salle': salle,
-      'date': date,
-      'time': time,
-      'price': price,
-    });
+  Future<void> addSession(SessionModel session) async {
+    await _db.add(session.toMap());
   }
 
-  /// ✏️ MODIFICATION
-  Future<void> updateSession({
-    required String id,
-    required String movieTitle,
-    required String salle,
-    required String date,
-    required String time,
-    required int price,
-  }) async {
-    await _db.doc(id).update({
-      'movieTitle': movieTitle,
-      'salle': salle,
-      'date': date,
-      'time': time,
-      'price': price,
-    });
+  Future<void> updateSession(SessionModel session) async {
+    await _db.doc(session.id).update(session.toMap());
   }
 
-  /// 🗑 SUPPRESSION
   Future<void> deleteSession(String id) async {
     await _db.doc(id).delete();
   }

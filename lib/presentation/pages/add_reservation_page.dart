@@ -12,9 +12,9 @@ class AddReservationPage extends StatefulWidget {
   final SessionModel session;
 
   const AddReservationPage({
-    Key? key,
+    super.key,
     required this.session,
-  }) : super(key: key);
+  });
 
   @override
   State<AddReservationPage> createState() => _AddReservationPageState();
@@ -28,6 +28,13 @@ class _AddReservationPageState extends State<AddReservationPage> {
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
     final total = tickets * widget.session.price;
+
+    final date =
+        widget.session.startTime.toLocal().toString().split(' ')[0];
+
+    final time =
+        "${widget.session.startTime.hour.toString().padLeft(2, '0')}:"
+        "${widget.session.startTime.minute.toString().padLeft(2, '0')}";
 
     return Scaffold(
       appBar: AppBar(title: const Text("Réservation")),
@@ -45,8 +52,8 @@ class _AddReservationPageState extends State<AddReservationPage> {
             ),
             const SizedBox(height: 8),
             Text("Salle : ${widget.session.salle}"),
-            Text("Date : ${widget.session.date}"),
-            Text("Heure : ${widget.session.time}"),
+            Text("Date : $date"),
+            Text("Heure : $time"),
             Text("Prix unitaire : ${widget.session.price} DH"),
 
             const Divider(height: 32),
@@ -59,9 +66,8 @@ class _AddReservationPageState extends State<AddReservationPage> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.remove),
-                  onPressed: tickets > 1
-                      ? () => setState(() => tickets--)
-                      : null,
+                  onPressed:
+                      tickets > 1 ? () => setState(() => tickets--) : null,
                 ),
                 Text(
                   tickets.toString(),
@@ -75,6 +81,7 @@ class _AddReservationPageState extends State<AddReservationPage> {
             ),
 
             const SizedBox(height: 16),
+
             Text(
               "Total à payer : $total DH",
               style: const TextStyle(
@@ -96,7 +103,6 @@ class _AddReservationPageState extends State<AddReservationPage> {
                     : () async {
                         setState(() => isPaying = true);
 
-                        // ⏳ Simulation paiement
                         await Future.delayed(const Duration(seconds: 2));
 
                         final reservation = ReservationModel(
@@ -105,8 +111,8 @@ class _AddReservationPageState extends State<AddReservationPage> {
                           sessionId: widget.session.id,
                           movieTitle: widget.session.movieTitle,
                           salle: widget.session.salle,
-                          date: widget.session.date,
-                          time: widget.session.time,
+                          startTime: widget.session.startTime,
+                          endTime: widget.session.endTime,
                           tickets: tickets,
                           price: widget.session.price,
                           total: total,
@@ -119,12 +125,15 @@ class _AddReservationPageState extends State<AddReservationPage> {
                             .read<ReservationBloc>()
                             .add(AddReservation(reservation));
 
+                        if (!mounted) return;
+
                         setState(() => isPaying = false);
 
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content:
-                                Text("Paiement effectué et réservation créée ✅"),
+                            content: Text(
+                              "Paiement effectué et réservation créée ✅",
+                            ),
                           ),
                         );
 

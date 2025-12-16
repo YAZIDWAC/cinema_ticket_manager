@@ -3,7 +3,6 @@ import '../../../data/repositories/session_repository.dart';
 import 'session_event.dart';
 import 'session_state.dart';
 
-
 class SessionBloc extends Bloc<SessionEvent, SessionState> {
   final SessionRepository repository;
 
@@ -31,29 +30,15 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     AddSession event,
     Emitter<SessionState> emit,
   ) async {
-    await repository.addSession(
-      movieTitle: event.movieTitle,
-      salle: event.salle,
-      date: event.date,
-      time: event.time,
-      price: event.price,
-    );
+    await repository.addSession(event.session);
   }
 
   Future<void> _onUpdateSession(
-  UpdateSession event,
-  Emitter<SessionState> emit,
-) async {
-  await repository.updateSession(
-    id: event.id,
-    movieTitle: event.movieTitle,
-    salle: event.salle,
-    date: event.date,
-    time: event.time,
-    price: event.price,
-  );
-}
-
+    UpdateSession event,
+    Emitter<SessionState> emit,
+  ) async {
+    await repository.updateSession(event.session);
+  }
 
   Future<void> _onDeleteSession(
     DeleteSession event,

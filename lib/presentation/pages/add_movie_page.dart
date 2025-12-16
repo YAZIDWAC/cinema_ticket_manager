@@ -36,7 +36,7 @@ class _AddMoviePageState extends State<AddMoviePage> {
     if (widget.movie != null) {
       titleController.text = widget.movie!.title;
       descriptionController.text = widget.movie!.description;
-      durationController.text = widget.movie!.duration;
+      durationController.text = widget.movie!.duration.toString();
       hasVF = widget.movie!.hasVF;
       hasVO = widget.movie!.hasVO;
       hasVOSTFR = widget.movie!.hasVOSTFR;
@@ -51,6 +51,10 @@ class _AddMoviePageState extends State<AddMoviePage> {
   }
 
   Future<void> submitMovie() async {
+    if (durationController.text.isEmpty) return;
+
+    final int duration = int.parse(durationController.text);
+
     String imageUrl = widget.movie?.imageUrl ?? '';
 
     if (selectedImage != null) {
@@ -62,12 +66,14 @@ class _AddMoviePageState extends State<AddMoviePage> {
       id: widget.movie?.id ?? '',
       title: titleController.text,
       description: descriptionController.text,
-      duration: durationController.text,
+duration: int.tryParse(durationController.text) ?? 0,
       hasVF: hasVF,
       hasVO: hasVO,
       hasVOSTFR: hasVOSTFR,
       imageUrl: imageUrl,
     );
+
+    if (!mounted) return;
 
     if (widget.movie == null) {
       context.read<MovieBloc>().add(AddMovie(movie));
@@ -100,7 +106,9 @@ class _AddMoviePageState extends State<AddMoviePage> {
             ),
             TextField(
               controller: durationController,
-              decoration: const InputDecoration(labelText: 'Durée'),
+              keyboardType: TextInputType.number,
+              decoration:
+                  const InputDecoration(labelText: 'Durée (minutes)'),
             ),
 
             CheckboxListTile(

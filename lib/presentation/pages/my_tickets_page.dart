@@ -9,13 +9,13 @@ import '../../domain/models/reservation_model.dart';
 import 'ticket_details_page.dart';
 
 class MyTicketsPage extends StatelessWidget {
-  const MyTicketsPage({Key? key}) : super(key: key);
+  const MyTicketsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser!;
 
-    // Charger les réservations du user
+    // ⚠️ Charger UNE SEULE FOIS (évite reload infini)
     context.read<ReservationBloc>().add(
           LoadMyReservations(user.uid),
         );
@@ -42,6 +42,13 @@ class MyTicketsPage extends StatelessWidget {
               itemBuilder: (context, index) {
                 final ReservationModel r = state.reservations[index];
 
+                final date =
+                    r.startTime.toLocal().toString().split(' ')[0];
+
+                final time =
+                    "${r.startTime.hour.toString().padLeft(2, '0')}:"
+                    "${r.startTime.minute.toString().padLeft(2, '0')}";
+
                 return Card(
                   margin: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -53,7 +60,7 @@ class MyTicketsPage extends StatelessWidget {
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     subtitle: Text(
-                      "${r.date} • ${r.time}\nSalle : ${r.salle}",
+                      "$date • $time\nSalle : ${r.salle}",
                     ),
                     trailing: Column(
                       mainAxisAlignment: MainAxisAlignment.center,

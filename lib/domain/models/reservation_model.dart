@@ -6,8 +6,8 @@ class ReservationModel {
   final String sessionId;
   final String movieTitle;
   final String salle;
-  final String date;
-  final String time;
+  final DateTime startTime;
+  final DateTime endTime;
   final int tickets;
   final int price;
   final int total;
@@ -20,8 +20,8 @@ class ReservationModel {
     required this.sessionId,
     required this.movieTitle,
     required this.salle,
-    required this.date,
-    required this.time,
+    required this.startTime,
+    required this.endTime,
     required this.tickets,
     required this.price,
     required this.total,
@@ -31,14 +31,15 @@ class ReservationModel {
 
   factory ReservationModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
+
     return ReservationModel(
       id: doc.id,
       userId: data['userId'],
       sessionId: data['sessionId'],
       movieTitle: data['movieTitle'],
       salle: data['salle'],
-      date: data['date'],
-      time: data['time'],
+      startTime: (data['startTime'] as Timestamp).toDate(),
+      endTime: (data['endTime'] as Timestamp).toDate(),
       tickets: data['tickets'],
       price: data['price'],
       total: data['total'],
@@ -53,8 +54,8 @@ class ReservationModel {
       'sessionId': sessionId,
       'movieTitle': movieTitle,
       'salle': salle,
-      'date': date,
-      'time': time,
+      'startTime': Timestamp.fromDate(startTime),
+      'endTime': Timestamp.fromDate(endTime),
       'tickets': tickets,
       'price': price,
       'total': total,
