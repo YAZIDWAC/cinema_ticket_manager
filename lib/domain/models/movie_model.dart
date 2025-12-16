@@ -22,16 +22,21 @@ class MovieModel {
   });
 
   factory MovieModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final data = doc.data() as Map<String, dynamic>?;
+
+    if (data == null) {
+      throw Exception('Movie data is null');
+    }
+
     return MovieModel(
       id: doc.id,
-      title: data['title'] ?? '',
-      description: data['description'] ?? '',
-      duration: data['duration'] ?? '',
-      hasVF: data['hasVF'] ?? false,
-      hasVO: data['hasVO'] ?? false,
-      hasVOSTFR: data['hasVOSTFR'] ?? false,
-      imageUrl: data['imageUrl'] ?? '',
+      title: data['title']?.toString() ?? '',
+      description: data['description']?.toString() ?? '',
+      duration: data['duration']?.toString() ?? '',
+      hasVF: data['hasVF'] == true,
+      hasVO: data['hasVO'] == true,
+      hasVOSTFR: data['hasVOSTFR'] == true,
+      imageUrl: data['imageUrl']?.toString() ?? '',
     );
   }
 

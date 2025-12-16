@@ -23,7 +23,7 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
       final movies = await repository.getMovies();
       emit(MovieLoaded(movies));
     } catch (e) {
-      emit(MovieError('Erreur chargement films'));
+      emit(MovieError(e.toString()));
     }
   }
 

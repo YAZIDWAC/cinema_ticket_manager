@@ -9,6 +9,7 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
   SessionBloc(this.repository) : super(SessionInitial()) {
     on<LoadSessions>(_onLoadSessions);
     on<AddSession>(_onAddSession);
+    on<UpdateSession>(_onUpdateSession);
     on<DeleteSession>(_onDeleteSession);
   }
 
@@ -21,7 +22,7 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     await emit.forEach(
       repository.getSessions(),
       onData: (sessions) => SessionLoaded(sessions),
-      onError: (error, _) => SessionError(error.toString()),
+      onError: (e, _) => SessionError(e.toString()),
     );
   }
 
@@ -29,13 +30,14 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     AddSession event,
     Emitter<SessionState> emit,
   ) async {
-    await repository.addSession(
-      movieTitle: event.movieTitle,
-      salle: event.salle,
-      date: event.date,
-      time: event.time,
-      price: event.price,
-    );
+    await repository.addSession(event.session);
+  }
+
+  Future<void> _onUpdateSession(
+    UpdateSession event,
+    Emitter<SessionState> emit,
+  ) async {
+    await repository.updateSession(event.id, event.session);
   }
 
   Future<void> _onDeleteSession(

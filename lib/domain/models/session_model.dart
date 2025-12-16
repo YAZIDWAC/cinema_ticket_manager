@@ -22,11 +22,11 @@ class SessionModel {
 
     return SessionModel(
       id: doc.id,
-      movieTitle: data['movieTitle'],
-      salle: data['salle'],
-      date: data['date'],
-      time: data['time'],
-      price: data['price'],
+      movieTitle: data['movieTitle'] ?? '',
+      salle: data['salle'] ?? '',
+      date: data['date'] ?? '',
+      time: data['time'] ?? '',
+      price: (data['price'] ?? 0) as int,
     );
   }
 

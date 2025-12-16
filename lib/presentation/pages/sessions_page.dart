@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../blocs/session/session_bloc.dart';
 import '../blocs/session/session_event.dart';
 import '../blocs/session/session_state.dart';
@@ -31,10 +30,6 @@ class SessionsPage extends StatelessWidget {
           }
 
           if (state is SessionLoaded) {
-            if (state.sessions.isEmpty) {
-              return const Center(child: Text('Aucune séance'));
-            }
-
             return ListView.builder(
               itemCount: state.sessions.length,
               itemBuilder: (context, index) {
@@ -42,23 +37,43 @@ class SessionsPage extends StatelessWidget {
 
                 return ListTile(
                   title: Text(s.movieTitle),
-                  subtitle: Text(
-                    '${s.salle} • ${s.date} • ${s.time} • ${s.price} DA',
-                  ),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {
-                      context
-                          .read<SessionBloc>()
-                          .add(DeleteSession(s.id));
-                    },
+                  subtitle:
+                      Text('${s.salle} • ${s.date} • ${s.time} • ${s.price} DA'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => AddSessionPage(session: s),
+                            ),
+                          );
+                        },
+                      ),
+                      IconButton(
+                        icon:
+                            const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () {
+                          context
+                              .read<SessionBloc>()
+                              .add(DeleteSession(s.id));
+                        },
+                      ),
+                    ],
                   ),
                 );
               },
             );
           }
 
-          return const Center(child: Text('Erreur'));
+          if (state is SessionError) {
+            return Center(child: Text(state.message));
+          }
+
+          return const SizedBox.shrink();
         },
       ),
     );
