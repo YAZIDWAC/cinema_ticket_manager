@@ -1,28 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../blocs/session/session_bloc.dart';
-import '../blocs/session/session_event.dart';
 import '../blocs/session/session_state.dart';
-import 'add_session_page.dart';
+import '../blocs/session/session_event.dart';
+import '../../domain/models/session_model.dart';
+import 'add_reservation_page.dart';
 
 class SessionsPage extends StatelessWidget {
-  const SessionsPage({super.key});
+  final bool isAdmin;
+  final String? movieTitle;
+
+  const SessionsPage({
+    Key? key,
+    required this.isAdmin,
+    this.movieTitle,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    context.read<SessionBloc>().add(LoadSessions());
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Gestion des séances')),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const AddSessionPage()),
-          );
-        },
-      ),
+      appBar: AppBar(title: const Text("Séances")),
       body: BlocBuilder<SessionBloc, SessionState>(
         builder: (context, state) {
           if (state is SessionLoading) {
@@ -30,39 +28,62 @@ class SessionsPage extends StatelessWidget {
           }
 
           if (state is SessionLoaded) {
-            return ListView.builder(
-              itemCount: state.sessions.length,
-              itemBuilder: (context, index) {
-                final s = state.sessions[index];
+            List<SessionModel> sessions = state.sessions;
 
-                return ListTile(
-                  title: Text(s.movieTitle),
-                  subtitle:
-                      Text('${s.salle} • ${s.date} • ${s.time} • ${s.price} DA'),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => AddSessionPage(session: s),
-                            ),
-                          );
-                        },
-                      ),
-                      IconButton(
-                        icon:
-                            const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () {
-                          context
-                              .read<SessionBloc>()
-                              .add(DeleteSession(s.id));
-                        },
-                      ),
-                    ],
+            if (movieTitle != null) {
+              sessions = sessions
+                  .where((s) => s.movieTitle == movieTitle)
+                  .toList();
+            }
+
+            if (sessions.isEmpty) {
+              return const Center(child: Text("Aucune séance disponible"));
+            }
+
+            return ListView.builder(
+              padding: const EdgeInsets.all(12),
+              itemCount: sessions.length,
+              itemBuilder: (context, index) {
+                final session = sessions[index];
+
+                return Card(
+                  elevation: 3,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  child: ListTile(
+                    title: Text(
+                      session.movieTitle,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Salle : ${session.salle}"),
+                        Text("Date : ${session.date}"),
+                        Text("Heure : ${session.time}"),
+                        Text("Prix : ${session.price} DH"),
+                      ],
+                    ),
+                    trailing: isAdmin
+                        ? IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () {
+                              context
+                                  .read<SessionBloc>()
+                                  .add(DeleteSession(session.id));
+                            },
+                          )
+                        : ElevatedButton(
+                            child: const Text("Réserver"),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      AddReservationPage(session: session),
+                                ),
+                              );
+                            },
+                          ),
                   ),
                 );
               },
@@ -73,7 +94,7 @@ class SessionsPage extends StatelessWidget {
             return Center(child: Text(state.message));
           }
 
-          return const SizedBox.shrink();
+          return const SizedBox();
         },
       ),
     );

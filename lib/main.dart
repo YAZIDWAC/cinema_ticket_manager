@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'data/repositories/session_repository.dart';
-import 'presentation/blocs/session/session_bloc.dart';
 
 import 'firebase_options.dart';
 
@@ -11,15 +9,22 @@ import 'presentation/blocs/auth/auth_bloc.dart';
 
 // MOVIES
 import 'presentation/blocs/movie/movie_bloc.dart';
+import 'presentation/blocs/movie/movie_event.dart';
 import 'data/repositories/movie_repository.dart';
 
 // SALLES
 import 'presentation/blocs/salle/salle_bloc.dart';
+import 'presentation/blocs/salle/salle_event.dart';
 import 'data/repositories/salle_repository.dart';
 
-// SESSIONS ✅
+// SESSIONS
 import 'presentation/blocs/session/session_bloc.dart';
+import 'presentation/blocs/session/session_event.dart';
 import 'data/repositories/session_repository.dart';
+
+// RESERVATIONS ✅
+import 'presentation/blocs/reservation/reservation_bloc.dart';
+import 'data/repositories/reservation_repository.dart';
 
 // UI
 import 'presentation/pages/login_page.dart';
@@ -34,22 +39,45 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-  providers: [
-    BlocProvider(create: (_) => AuthBloc()),
-    BlocProvider(create: (_) => MovieBloc(MovieRepository())),
-    BlocProvider(create: (_) => SalleBloc(SalleRepository())),
-    BlocProvider(create: (_) => SessionBloc(SessionRepository())),
-  ],
-  child: MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: LoginPage(),
-  ),
-);
+      providers: [
+        // AUTH
+        BlocProvider<AuthBloc>(
+          create: (_) => AuthBloc(),
+        ),
 
+        // MOVIES
+        BlocProvider<MovieBloc>(
+          create: (_) =>
+              MovieBloc(MovieRepository())..add(LoadMovies()),
+        ),
+
+        // SALLES
+        BlocProvider<SalleBloc>(
+          create: (_) =>
+              SalleBloc(SalleRepository())..add(LoadSalles()),
+        ),
+
+        // SESSIONS
+        BlocProvider<SessionBloc>(
+          create: (_) =>
+              SessionBloc(SessionRepository())..add(LoadSessions()),
+        ),
+
+        // RESERVATIONS ✅
+        BlocProvider<ReservationBloc>(
+          create: (_) =>
+              ReservationBloc(ReservationRepository()),
+        ),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: LoginPage(),
+      ),
+    );
   }
 }

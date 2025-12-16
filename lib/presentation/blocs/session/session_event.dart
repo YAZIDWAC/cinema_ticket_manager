@@ -1,18 +1,39 @@
-import '../../../domain/models/session_model.dart';
-
 abstract class SessionEvent {}
 
 class LoadSessions extends SessionEvent {}
 
 class AddSession extends SessionEvent {
-  final SessionModel session;
-  AddSession(this.session);
+  final String movieTitle;
+  final String salle;
+  final String date;
+  final String time;
+  final int price;
+
+  AddSession({
+    required this.movieTitle,
+    required this.salle,
+    required this.date,
+    required this.time,
+    required this.price,
+  });
 }
 
 class UpdateSession extends SessionEvent {
   final String id;
-  final SessionModel session;
-  UpdateSession(this.id, this.session);
+  final String movieTitle;
+  final String salle;
+  final String date;
+  final String time;
+  final int price;
+
+  UpdateSession({
+    required this.id,
+    required this.movieTitle,
+    required this.salle,
+    required this.date,
+    required this.time,
+    required this.price,
+  });
 }
 
 class DeleteSession extends SessionEvent {
