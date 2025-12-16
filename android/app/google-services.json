@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "701188589822",
+    "project_id": "cinemafirebase-26d00",
+    "storage_bucket": "cinemafirebase-26d00.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:701188589822:android:c04db90f3a4ad127a63daf",
+        "android_client_info": {
+          "package_name": "com.example.cinema_ticket_manager"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrgdlTTNvO_Lpdgs2gGuBG7_TnA-ExWnU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
