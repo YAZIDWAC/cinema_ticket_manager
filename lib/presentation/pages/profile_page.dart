@@ -11,11 +11,16 @@ class ProfilePage extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Profil")),
+      appBar: AppBar(
+        title: const Text("Profil"),
+        centerTitle: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: user == null
-            ? const Center(child: Text("Utilisateur non connecté"))
+            ? const Center(
+                child: Text("Utilisateur non connecté"),
+              )
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -25,20 +30,18 @@ class ProfilePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
 
+                  /// ✅ EMAIL UNIQUEMENT
                   Text(
                     "Email : ${user.email}",
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 8),
-
-                  Text(
-                    "User ID : ${user.uid}",
-                    style: const TextStyle(fontSize: 14),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
 
                   const Divider(height: 32),
 
-                  // (OPTIONNEL) futur bouton modifier profil
+                  /// ✏️ Modifier profil (placeholder)
                   ElevatedButton.icon(
                     icon: const Icon(Icons.edit),
                     label: const Text("Modifier le profil"),
@@ -54,12 +57,14 @@ class ProfilePage extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
-                  // 🚪 Déconnexion
+                  /// 🚪 Déconnexion
                   ElevatedButton.icon(
                     icon: const Icon(Icons.logout),
                     label: const Text("Se déconnecter"),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
+                      backgroundColor:
+                          Theme.of(context).primaryColor,
+                      foregroundColor: Colors.white,
                     ),
                     onPressed: () async {
                       await FirebaseAuth.instance.signOut();
@@ -67,7 +72,7 @@ class ProfilePage extends StatelessWidget {
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => LoginPage(),
+                          builder: (_) => const LoginPage(),
                         ),
                         (_) => false,
                       );

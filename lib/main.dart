@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'firebase_options.dart';
+import 'presentation/pages/splash_page.dart';
 
 // AUTH
 import 'presentation/blocs/auth/auth_bloc.dart';
@@ -22,93 +23,82 @@ import 'presentation/blocs/session/session_bloc.dart';
 import 'presentation/blocs/session/session_event.dart';
 import 'data/repositories/session_repository.dart';
 
-// RESERVATIONS ✅
+// RESERVATIONS
 import 'presentation/blocs/reservation/reservation_bloc.dart';
 import 'data/repositories/reservation_repository.dart';
 
-// UI
-import 'presentation/pages/login_page.dart';
+/// 🎨 GRENAT UNIQUE
+const Color kGrenat = Color(0xFF8B1E3F);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        // AUTH
-        BlocProvider<AuthBloc>(
-          create: (_) => AuthBloc(),
-        ),
-
-        // MOVIES
+        BlocProvider<AuthBloc>(create: (_) => AuthBloc()),
         BlocProvider<MovieBloc>(
           create: (_) =>
               MovieBloc(MovieRepository())..add(LoadMovies()),
         ),
-
-        // SALLES
         BlocProvider<SalleBloc>(
           create: (_) =>
               SalleBloc(SalleRepository())..add(LoadSalles()),
         ),
-
-        // SESSIONS
         BlocProvider<SessionBloc>(
-  create: (_) =>
-      SessionBloc(SessionRepository())..add(LoadSessions()),
-),
-
-        // RESERVATIONS ✅
+          create: (_) =>
+              SessionBloc(SessionRepository())..add(LoadSessions()),
+        ),
         BlocProvider<ReservationBloc>(
           create: (_) =>
               ReservationBloc(ReservationRepository()),
         ),
       ],
       child: MaterialApp(
-  debugShowCheckedModeBanner: false,
-  theme: ThemeData(
-    primaryColor: Colors.deepPurple,
-    scaffoldBackgroundColor: const Color(0xFFF5F5F5),
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          useMaterial3: false,
+          primaryColor: kGrenat,
+          scaffoldBackgroundColor: const Color(0xFFFDF5F5),
 
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.deepPurple,
-      foregroundColor: Colors.white,
-      centerTitle: true,
-      elevation: 0,
-    ),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: kGrenat,
+            foregroundColor: Colors.white,
+            centerTitle: true,
+            elevation: 0,
+          ),
 
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.deepPurple,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: kGrenat,
+              foregroundColor: Colors.white,
+              elevation: 6,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+          ),
+
+          inputDecorationTheme: InputDecorationTheme(
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide.none,
+            ),
+          ),
         ),
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        home: const SplashPage(),
       ),
-    ),
-
-    inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      fillColor: Colors.white,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide.none,
-      ),
-    ),
-  ),
-  home: LoginPage(),
-),
-
     );
   }
 }
