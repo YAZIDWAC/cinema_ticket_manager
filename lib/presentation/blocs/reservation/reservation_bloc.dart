@@ -4,36 +4,38 @@ import '../../../data/repositories/reservation_repository.dart';
 import 'reservation_event.dart';
 import 'reservation_state.dart';
 
-class ReservationBloc extends Bloc<ReservationEvent, ReservationState> {
+class ReservationBloc
+    extends Bloc<ReservationEvent, ReservationState> {
   final ReservationRepository repository;
 
-  ReservationBloc(this.repository) : super(ReservationInitial()) {
-    on<AddReservation>(_onAddReservation);
-    on<LoadMyReservations>(_onLoadMyReservations);
+  ReservationBloc(this.repository)
+      : super(ReservationInitial()) {
+    on<AddReservation>(_addReservation);
+    on<LoadMyReservations>(_loadMyReservations);
   }
 
-  Future<void> _onAddReservation(
+  Future<void> _addReservation(
     AddReservation event,
     Emitter<ReservationState> emit,
   ) async {
     try {
       await repository.addReservation(event.reservation);
-      emit(ReservationSuccess());
     } catch (e) {
-      emit(ReservationError(e.toString()));
+      emit(ReservationError("Erreur lors du paiement"));
     }
   }
 
-  Future<void> _onLoadMyReservations(
+  Future<void> _loadMyReservations(
     LoadMyReservations event,
     Emitter<ReservationState> emit,
   ) async {
     emit(ReservationLoading());
-
-    await emit.forEach(
-      repository.getUserReservations(event.userId),
-      onData: (data) => ReservationLoaded(data),
-      onError: (e, _) => ReservationError(e.toString()),
-    );
+    try {
+      final reservations =
+          await repository.getMyReservations(event.userId);
+      emit(ReservationLoaded(reservations));
+    } catch (e) {
+      emit(ReservationError("Erreur chargement tickets"));
+    }
   }
 }

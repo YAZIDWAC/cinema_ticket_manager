@@ -24,7 +24,6 @@ class _LoginPageState extends State<LoginPage>
   late AnimationController _logoController;
   late Animation<double> _logoScale;
 
-  /// 🎨 GRENAT UNIQUE
   static const Color grenat = Color(0xFF8B1E3F);
 
   @override
@@ -52,16 +51,14 @@ class _LoginPageState extends State<LoginPage>
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        color: grenat,
         width: double.infinity,
         height: double.infinity,
-        color: grenat,
-
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
               children: [
-                /// 🎬 LOGO
                 ScaleTransition(
                   scale: _logoScale,
                   child: Container(
@@ -84,9 +81,7 @@ class _LoginPageState extends State<LoginPage>
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 24),
-
                 const Text(
                   "My Cinema",
                   style: TextStyle(
@@ -95,17 +90,14 @@ class _LoginPageState extends State<LoginPage>
                     color: Colors.white,
                   ),
                 ),
-
                 const SizedBox(height: 6),
-
                 const Text(
                   "Votre cinéma, vos places, en un clic",
                   style: TextStyle(color: Colors.white70),
                 ),
-
                 const SizedBox(height: 40),
 
-                /// 🧾 FORMULAIRE (SANS CARD)
+                /// FORMULAIRE
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
@@ -159,9 +151,7 @@ class _LoginPageState extends State<LoginPage>
                               ),
                             ),
                           ),
-
                           const SizedBox(height: 16),
-
                           TextField(
                             controller: passwordCtrl,
                             obscureText: true,
@@ -176,9 +166,7 @@ class _LoginPageState extends State<LoginPage>
                               ),
                             ),
                           ),
-
                           const SizedBox(height: 28),
-
                           SizedBox(
                             width: double.infinity,
                             height: 52,
@@ -212,9 +200,7 @@ class _LoginPageState extends State<LoginPage>
                                     ),
                                   ),
                           ),
-
                           const SizedBox(height: 20),
-
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

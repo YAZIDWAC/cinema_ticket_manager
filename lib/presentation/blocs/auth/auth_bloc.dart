@@ -16,30 +16,36 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _login(
-      LoginRequested event, Emitter<AuthState> emit) async {
+    LoginRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthLoading());
+
     try {
       final cred = await _auth.signInWithEmailAndPassword(
         email: event.email,
         password: event.password,
       );
 
-      final doc = await _firestore
+      final userDoc = await _firestore
           .collection('users')
           .doc(cred.user!.uid)
           .get();
 
-      final role = doc.data()?['role'] ?? 'client';
+      final role = userDoc.data()?['role'] ?? 'client';
 
       emit(AuthAuthenticated(role: role));
-    } catch (_) {
+    } catch (e) {
       emit(AuthError("Email ou mot de passe incorrect"));
     }
   }
 
   Future<void> _register(
-      RegisterRequested event, Emitter<AuthState> emit) async {
+    RegisterRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthLoading());
+
     try {
       final cred = await _auth.createUserWithEmailAndPassword(
         email: event.email,
@@ -49,16 +55,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await _firestore.collection('users').doc(cred.user!.uid).set({
         'email': event.email,
         'role': 'client',
+        'createdAt': FieldValue.serverTimestamp(),
       });
 
       emit(AuthAuthenticated(role: 'client'));
-    } catch (_) {
+    } catch (e) {
       emit(AuthError("Erreur d'inscription"));
     }
   }
 
   Future<void> _logout(
-      LogoutRequested event, Emitter<AuthState> emit) async {
+    LogoutRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     await _auth.signOut();
     emit(AuthUnauthenticated());
   }

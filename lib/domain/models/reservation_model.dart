@@ -12,7 +12,6 @@ class ReservationModel {
   final int price;
   final int total;
   final String qrCode;
-  final DateTime? createdAt; // ✅ nullable côté app
 
   ReservationModel({
     required this.id,
@@ -26,31 +25,32 @@ class ReservationModel {
     required this.price,
     required this.total,
     required this.qrCode,
-    this.createdAt,
   });
 
-  factory ReservationModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-
+  /// 🔁 FIRESTORE → APP
+  factory ReservationModel.fromJson(
+    Map<String, dynamic> json,
+    String id,
+  ) {
     return ReservationModel(
-      id: doc.id,
-      userId: data['userId'],
-      sessionId: data['sessionId'],
-      movieTitle: data['movieTitle'],
-      salle: data['salle'],
-      startTime: (data['startTime'] as Timestamp).toDate(),
-      endTime: (data['endTime'] as Timestamp).toDate(),
-      tickets: data['tickets'],
-      price: data['price'],
-      total: data['total'],
-      qrCode: data['qrCode'],
-      createdAt: data['createdAt'] != null
-          ? (data['createdAt'] as Timestamp).toDate()
-          : null,
+      id: id,
+      userId: json['userId'],
+      sessionId: json['sessionId'],
+      movieTitle: json['movieTitle'],
+      salle: json['salle'],
+      startTime:
+          (json['startTime'] as Timestamp).toDate(),
+      endTime:
+          (json['endTime'] as Timestamp).toDate(),
+      tickets: json['tickets'],
+      price: json['price'],
+      total: json['total'],
+      qrCode: json['qrCode'],
     );
   }
 
-  Map<String, dynamic> toMap() {
+  /// 🔁 APP → FIRESTORE
+  Map<String, dynamic> toJson() {
     return {
       'userId': userId,
       'sessionId': sessionId,
@@ -62,7 +62,6 @@ class ReservationModel {
       'price': price,
       'total': total,
       'qrCode': qrCode,
-      'createdAt': FieldValue.serverTimestamp(), // ✅ correct
     };
   }
 }

@@ -10,10 +10,12 @@ class ReservationSuccess extends ReservationState {}
 
 class ReservationLoaded extends ReservationState {
   final List<ReservationModel> reservations;
+
   ReservationLoaded(this.reservations);
 }
 
 class ReservationError extends ReservationState {
   final String message;
+
   ReservationError(this.message);
 }

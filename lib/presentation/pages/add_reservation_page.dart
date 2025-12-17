@@ -37,7 +37,8 @@ class _AddReservationPageState extends State<AddReservationPage> {
         widget.session.startTime.toLocal().toString().split(' ')[0];
 
     final time =
-        "${widget.session.startTime.hour.toString().padLeft(2, '0')}:${widget.session.startTime.minute.toString().padLeft(2, '0')}";
+        "${widget.session.startTime.hour.toString().padLeft(2, '0')}:"
+        "${widget.session.startTime.minute.toString().padLeft(2, '0')}";
 
     return Scaffold(
       appBar: AppBar(title: const Text("Réservation")),
@@ -46,6 +47,7 @@ class _AddReservationPageState extends State<AddReservationPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            /// 🎬 INFOS FILM
             Text(
               widget.session.movieTitle,
               style: const TextStyle(
@@ -61,6 +63,7 @@ class _AddReservationPageState extends State<AddReservationPage> {
 
             const Divider(height: 32),
 
+            /// 🎟️ NOMBRE DE TICKETS
             const Text(
               "Nombre de tickets",
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -70,8 +73,9 @@ class _AddReservationPageState extends State<AddReservationPage> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.remove),
-                  onPressed:
-                      tickets > 1 ? () => setState(() => tickets--) : null,
+                  onPressed: tickets > 1
+                      ? () => setState(() => tickets--)
+                      : null,
                 ),
                 Text(
                   tickets.toString(),
@@ -88,6 +92,7 @@ class _AddReservationPageState extends State<AddReservationPage> {
 
             const SizedBox(height: 16),
 
+            /// 💰 TOTAL
             Text(
               "Total : $total DH",
               style: const TextStyle(
@@ -102,9 +107,7 @@ class _AddReservationPageState extends State<AddReservationPage> {
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
               child: isPaying
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
+                  ? const Center(child: CircularProgressIndicator())
                   : SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -115,6 +118,7 @@ class _AddReservationPageState extends State<AddReservationPage> {
                             : () async {
                                 setState(() => isPaying = true);
 
+                                // Simulation paiement
                                 await Future.delayed(
                                   const Duration(seconds: 2),
                                 );
@@ -128,7 +132,8 @@ class _AddReservationPageState extends State<AddReservationPage> {
                                   salle: widget.session.salle,
                                   startTime:
                                       widget.session.startTime,
-                                  endTime: widget.session.endTime,
+                                  endTime:
+                                      widget.session.endTime,
                                   tickets: tickets,
                                   price: widget.session.price,
                                   total: total,
@@ -136,9 +141,13 @@ class _AddReservationPageState extends State<AddReservationPage> {
                                       '${user.uid}-${DateTime.now().millisecondsSinceEpoch}',
                                 );
 
-                                context
-                                    .read<ReservationBloc>()
-                                    .add(AddReservation(reservation));
+                                /// ✅ AJOUT RÉSERVATION + MAJ PLACES
+                                context.read<ReservationBloc>().add(
+                                      AddReservation(
+                                        reservation,
+                                        reservedTickets: tickets,
+                                      ),
+                                    );
 
                                 if (!mounted) return;
 
