@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../../../data/repositories/reservation_repository.dart';
+import '../../../domain/models/reservation_model.dart';
 import 'reservation_event.dart';
 import 'reservation_state.dart';
 
@@ -19,9 +19,15 @@ class ReservationBloc
     Emitter<ReservationState> emit,
   ) async {
     try {
+      emit(ReservationLoading());
+
       await repository.addReservation(event.reservation);
+
+      emit(ReservationSuccess());
     } catch (e) {
-      emit(ReservationError("Erreur lors du paiement"));
+      emit(
+        ReservationError("Erreur lors de la réservation"),
+      );
     }
   }
 
@@ -29,13 +35,17 @@ class ReservationBloc
     LoadMyReservations event,
     Emitter<ReservationState> emit,
   ) async {
-    emit(ReservationLoading());
     try {
+      emit(ReservationLoading());
+
       final reservations =
           await repository.getMyReservations(event.userId);
+
       emit(ReservationLoaded(reservations));
     } catch (e) {
-      emit(ReservationError("Erreur chargement tickets"));
+      emit(
+        ReservationError("Erreur chargement tickets"),
+      );
     }
   }
 }

@@ -13,6 +13,7 @@ class ReservationModel {
   final int total;
   final String qrCode;
 
+
   ReservationModel({
     required this.id,
     required this.userId,

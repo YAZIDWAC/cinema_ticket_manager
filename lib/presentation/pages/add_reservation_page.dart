@@ -4,8 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../domain/models/session_model.dart';
 import '../../domain/models/reservation_model.dart';
+
 import '../blocs/reservation/reservation_bloc.dart';
 import '../blocs/reservation/reservation_event.dart';
+
+import '../blocs/session/session_bloc.dart';
+import '../blocs/session/session_event.dart';
 
 class AddReservationPage extends StatefulWidget {
   final SessionModel session;
@@ -118,9 +122,9 @@ class _AddReservationPageState extends State<AddReservationPage> {
                             : () async {
                                 setState(() => isPaying = true);
 
-                                // Simulation paiement
+                                // ⏳ Simulation paiement
                                 await Future.delayed(
-                                  const Duration(seconds: 2),
+                                  const Duration(seconds: 1),
                                 );
 
                                 final reservation = ReservationModel(
@@ -141,13 +145,15 @@ class _AddReservationPageState extends State<AddReservationPage> {
                                       '${user.uid}-${DateTime.now().millisecondsSinceEpoch}',
                                 );
 
-                                /// ✅ AJOUT RÉSERVATION + MAJ PLACES
-                                context.read<ReservationBloc>().add(
-                                      AddReservation(
-                                        reservation,
-                                        reservedTickets: tickets,
-                                      ),
-                                    );
+                                /// ✅ AJOUT RÉSERVATION
+                                context
+                                    .read<ReservationBloc>()
+                                    .add(AddReservation(reservation));
+
+                                /// 🔄 MAJ DES SÉANCES
+                                context
+                                    .read<SessionBloc>()
+                                    .add(LoadSessions());
 
                                 if (!mounted) return;
 

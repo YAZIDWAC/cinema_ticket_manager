@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-
 import '../../domain/models/reservation_model.dart';
 
 class TicketDetailsPage extends StatelessWidget {
@@ -23,55 +22,136 @@ class TicketDetailsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Détails du ticket"),
+        centerTitle: true,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              reservation.movieTitle,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
+        child: Center(
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+
+            /// ✅ ICI LA CORRECTION
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 10,
+                  offset: Offset(0, 5),
+                ),
+              ],
             ),
 
-            const SizedBox(height: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                /// 🎬 TITRE FILM
+                Text(
+                  reservation.movieTitle,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
 
-            Text("Salle : ${reservation.salle}"),
-            Text("Date : $date"),
-            Text("Heure : $time"),
-            Text("Tickets : ${reservation.tickets}"),
+                const SizedBox(height: 12),
 
-            const SizedBox(height: 8),
+                _infoRow("Salle", reservation.salle),
+                _infoRow("Date", date),
+                _infoRow("Heure", time),
+                _infoRow(
+                  "Tickets",
+                  reservation.tickets.toString(),
+                ),
 
-            Text(
-              "Total payé : ${reservation.total} DH",
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
+                const Divider(height: 30),
+
+                /// 💰 TOTAL
+                Text(
+                  "Total payé",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  "${reservation.total} DH",
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                /// 🔳 QR CODE
+                const Text(
+                  "QR Code",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: QrImageView(
+                    data: reservation.qrCode,
+                    size: 220,
+                    backgroundColor: Colors.white,
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                Text(
+                  "Présentez ce QR code à l’entrée",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+              ],
             ),
-
-            const SizedBox(height: 32),
-
-            const Text(
-              "QR Code",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            QrImageView(
-              data: reservation.qrCode,
-              size: 220,
-            ),
-          ],
+          ),
         ),
+      ),
+    );
+  }
+
+  /// 🔹 LIGNE INFO
+  Widget _infoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            "$label :",
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey.shade700,
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }
