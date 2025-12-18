@@ -18,25 +18,6 @@ class AdminHomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Administration"),
-        actions: [
-          PopupMenuButton<String>(
-            icon: const CircleAvatar(
-              backgroundColor: Colors.white,
-              child: Icon(Icons.person, color: grenat),
-            ),
-            onSelected: (value) {
-              if (value == 'logout') {
-                context.read<AuthBloc>().add(LogoutRequested());
-              }
-            },
-            itemBuilder: (_) => const [
-              PopupMenuItem(
-                value: 'logout',
-                child: Text("Déconnexion"),
-              ),
-            ],
-          ),
-        ],
       ),
 
       body: Padding(
@@ -81,6 +62,19 @@ class AdminHomePage extends StatelessWidget {
           ],
         ),
       ),
+
+      /// 🔴 BOUTON LOGOUT EN BAS À GAUCHE
+      floatingActionButton: FloatingActionButton.extended(
+        heroTag: "logoutBtn",
+        backgroundColor: Colors.red,
+        icon: const Icon(Icons.logout),
+        label: const Text("Logout"),
+        onPressed: () {
+          context.read<AuthBloc>().add(LogoutRequested());
+        },
+      ),
+      floatingActionButtonLocation:
+          FloatingActionButtonLocation.startFloat, // 👈 BAS GAUCHE
     );
   }
 }
@@ -115,7 +109,7 @@ class _AdminImageCard extends StatelessWidget {
         ),
         child: Column(
           children: [
-            /// 🖼 IMAGE QUI REMPLIT LE CADRE
+            /// 🖼 IMAGE
             Expanded(
               child: ClipRRect(
                 borderRadius: const BorderRadius.vertical(
@@ -124,7 +118,7 @@ class _AdminImageCard extends StatelessWidget {
                 child: Image.asset(
                   imagePath,
                   width: double.infinity,
-                  fit: BoxFit.cover, // ✅ REMPLIT TOUT
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -146,4 +140,3 @@ class _AdminImageCard extends StatelessWidget {
     );
   }
 }
-

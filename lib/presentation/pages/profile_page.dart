@@ -4,9 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'login_page.dart';
 
-/// 🎨 GRENAT GLOBAL
 const Color kGrenat = Color(0xFF8B1E3F);
-
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
@@ -15,7 +13,6 @@ class ProfilePage extends StatelessWidget {
         .collection('users')
         .doc(uid)
         .get();
-
     return doc.data()?['role'] ?? 'client';
   }
 
@@ -27,67 +24,62 @@ class ProfilePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Profil"),
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // ✅ BACK FONCTIONNE
+          },
+        ),
       ),
       body: user == null
-          ? const Center(
-              child: Text("Utilisateur non connecté"),
-            )
+          ? const Center(child: Text("Utilisateur non connecté"))
           : FutureBuilder<String>(
               future: _getUserRole(user.uid),
               builder: (context, snapshot) {
-                final role = snapshot.data ?? '';
+                if (snapshot.connectionState ==
+                    ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
 
-                return Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      /// 👤 AVATAR
-                      Container(
-                        padding: const EdgeInsets.all(22),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: kGrenat.withOpacity(0.25),
-                              blurRadius: 25,
-                              offset: const Offset(0, 12),
-                            ),
-                          ],
+                final role = snapshot.data ?? 'client';
+
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircleAvatar(
+                          radius: 55,
+                          backgroundColor: Colors.white,
+                          child: Icon(
+                            Icons.person,
+                            size: 60,
+                            color: kGrenat,
+                          ),
                         ),
-                        child: const Icon(
-                          Icons.person,
-                          size: 70,
-                          color: kGrenat,
+                        const SizedBox(height: 20),
+                        Text(
+                          user.email ?? '',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      /// 📧 EMAIL
-                      Text(
-                        user.email ?? '',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      /// 🛡 RÔLE (ADMIN / CLIENT)
-                      if (role.isNotEmpty)
+                        const SizedBox(height: 10),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
+                            horizontal: 18,
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
                             color: role == 'admin'
                                 ? kGrenat
                                 : Colors.grey.shade300,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius:
+                                BorderRadius.circular(20),
                           ),
                           child: Text(
                             role.toUpperCase(),
@@ -99,52 +91,47 @@ class ProfilePage extends StatelessWidget {
                             ),
                           ),
                         ),
-
-                      const SizedBox(height: 32),
-
-                      /// ✏️ MODIFIER PROFIL (PLACEHOLDER)
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.edit),
-                          label: const Text("Modifier le profil"),
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content:
-                                    Text("Fonctionnalité à venir 👷"),
+                        const SizedBox(height: 40),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.logout),
+                            label:
+                                const Text("Se déconnecter"),
+                            style:
+                                ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
+                              padding:
+                                  const EdgeInsets.symmetric(
+                                vertical: 14,
                               ),
-                            );
-                          },
-                        ),
-                      ),
+                              shape:
+                                  RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(
+                                        14),
+                              ),
+                            ),
+                            onPressed: () async {
+                              await FirebaseAuth.instance
+                                  .signOut();
 
-                      const SizedBox(height: 16),
+                              if (!context.mounted) return;
 
-                      /// 🚪 DÉCONNEXION
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.logout),
-                          label: const Text("Se déconnecter"),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      const LoginPage(),
+                                ),
+                                (_) => false,
+                              );
+                            },
                           ),
-                          onPressed: () async {
-                            await FirebaseAuth.instance.signOut();
-
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const LoginPage(),
-                              ),
-                              (_) => false,
-                            );
-                          },
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               },
